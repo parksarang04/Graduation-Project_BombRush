@@ -5,15 +5,30 @@ using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
 
-public class FusionBootstrap : MonoBehaviour    , INetworkRunnerCallbacks
+public class FusionBootstrap : MonoBehaviour, INetworkRunnerCallbacks
 {
     [Header("Session")]
     [SerializeField] private string sessionName = "Room_01";
+
+    [Header("Player")]
+    [SerializeField] private NetworkPrefabRef playerPrefab;                     // 네트워크에 등록된 프리팹
+    [SerializeField] private Transform[] spawnPoints;                           // 스폰 위치 설정
 
     private NetworkRunner runner;
 
     public void StartHost() => _ = StartGame(GameMode.Host);
     public void StartClinet() => _ = StartGame(GameMode.Client);
+
+    private Vector3 GetSpawnPosition(PlayerRef player)
+    {
+        if (spawnPoints != null && spawnPoints.Length > 0)  // SpawnPoints가 최소 1개 이상 들어있을 때만 실행
+        {
+            int index = player.RawEncoded % spawnPoints.Length;
+            return spawnPoints[index].position;
+        }
+
+        return new Vector3(player.RawEncoded * 2, 1, 0);
+    }
 
     private async Task StartGame(GameMode mode)
     {
@@ -41,7 +56,22 @@ public class FusionBootstrap : MonoBehaviour    , INetworkRunnerCallbacks
 
     //-------------- 콜백 (필수/미사용은 빈 구현)--------------//
 
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) 
+    {
+        Debug.Log($"플레이어 입장 : {player}");
+
+        if (runner.IsPlayer == false)
+            return;
+
+        Vector3 spawnPos = GetSpawnPosition(player);
+
+        runner.Spawn(
+           playerPrefab,
+           spawnPos,
+           Quaternion.identity,
+           player
+        );
+    }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
