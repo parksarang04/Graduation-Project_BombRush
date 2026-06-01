@@ -8,10 +8,37 @@ public class SimplePlayer : NetworkBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotateSpeed = 10f;
 
-    /* Fusion 버전으 ㅣ네트워크 업데이트 함수 Unity의 업데이트 대신 쓴다. */
+    // 슬로우 관련 추가
+    [Networked] private float SlowMultiplier {  get; set; } // 1 = 정상, 0.5 = 절반속도
+    [Networked] private TickTimer SlowTimer { get; set; }
 
+    public override void Spawned()
+    {
+        if (Object.HasStateAuthority)
+        {
+            SlowMultiplier = 1f;    // 기본값 정상속도
+        }
+    }
+
+    // 슬로우 적용 - ESkill에서 호출
+    public void ApplySlow(float multplier, float duration)
+    {
+        if (!Object.HasStateAuthority) return;
+
+        SlowMultiplier = multplier;
+        SlowTimer = TickTimer.CreateFromSeconds(Runner, duration);
+    }
+
+    /* Fusion 버전의 네트워크 업데이트 함수 Unity의 업데이트 대신 쓴다. */
     public override void FixedUpdateNetwork()
     {
+        // 슬로우 시간 끝나면 정상속도로 복귀
+        if (SlowMultiplier < 1f && SlowTimer.Expired(Runner))
+        {
+            SlowMultiplier = 1f;
+            Debug.Log("슬로우 해제");
+        }
+
         if (GetInput<FusionBootstrap.NetworkInputData>(out var inputData))
         {
             Vector3 move = new Vector3(inputData.move.x, 0f, inputData.move.y);
@@ -19,7 +46,8 @@ public class SimplePlayer : NetworkBehaviour
             if (move.sqrMagnitude > 1f)
                 move.Normalize();
 
-            transform.position += move * moveSpeed * Runner.DeltaTime;
+            // 슬로우 적용해서 이동
+            transform.position += move * moveSpeed * SlowMultiplier * Runner.DeltaTime;
 
             if (move.sqrMagnitude > 0.001f)
             {
