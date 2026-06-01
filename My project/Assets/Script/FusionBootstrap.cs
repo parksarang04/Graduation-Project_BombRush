@@ -14,7 +14,14 @@ public class FusionBootstrap : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private NetworkPrefabRef playerPrefab;                     // 네트워크에 등록된 프리팹
     [SerializeField] private Transform[] spawnPoints;                           // 스폰 위치 설정
 
+    private Dictionary<PlayerRef, NetworkObject> playerObjects = new();
+
     private NetworkRunner runner;
+
+    public struct NetworkInputData : INetworkInput
+    {
+        public Vector2 move;
+    }
 
     public void StartHost() => _ = StartGame(GameMode.Host);
     public void StartClinet() => _ = StartGame(GameMode.Client);
@@ -65,16 +72,39 @@ public class FusionBootstrap : MonoBehaviour, INetworkRunnerCallbacks
 
         Vector3 spawnPos = GetSpawnPosition(player);
 
-        runner.Spawn(
+        var obj =runner.Spawn(
            playerPrefab,
            spawnPos,
            Quaternion.identity,
            player
         );
-    }
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
 
-    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+        playerObjects[player] = obj;
+
+    }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) 
+    {
+        if (!runner.IsServer) return;
+
+        if (playerObjects.TryGetValue(player, out var obj))
+        {
+            runner.Despawn(obj);
+            playerObjects.Remove(player);
+        }
+        Debug.Log($"플레이어 제거됨 : {player}");
+    }
+
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+        NetworkInputData data = new NetworkInputData();
+
+        data.move = new Vector2(
+            Input.GetAxisRaw("Horizontal"),     // GetAxis = 부드러운 이동 || GetAxisRaw = 키보드 값을 눌렀을때 즉시 반응
+            Input.GetAxisRaw("Vertical")
+        );
+
+        input.Set(data);
+    }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player , NetworkInput input) { }
 

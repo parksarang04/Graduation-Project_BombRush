@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 8092444574872558096}
   - component: {fileID: 2725447725377656180}
   - component: {fileID: 2656243317142163944}
+  - component: {fileID: -1396065867897791950}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -142,7 +143,7 @@ Transform:
   m_GameObject: {fileID: 1246591056798348852}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalPosition: {x: 1, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -247,6 +248,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2656243317142163944}
+  - {fileID: -1396065867897791950}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2656243317142163944
 MonoBehaviour:
@@ -265,3 +267,17 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &-1396065867897791950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246591056798348852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0bc9c2fca07f0747af6e3b8515ce53d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimplePlayer
+  moveSpeed: 5
+  rotateSpeed: 10
