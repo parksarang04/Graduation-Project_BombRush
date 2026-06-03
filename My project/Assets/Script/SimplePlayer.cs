@@ -49,6 +49,12 @@ public class SimplePlayer : NetworkBehaviour
             // 슬로우 적용해서 이동
             transform.position += move * moveSpeed * SlowMultiplier * Runner.DeltaTime;
 
+            // 맵 경계 클램프 추가
+            Vector3 pos = transform.position;
+            pos.x = Mathf.Clamp(pos.x, -MapBoundary.MaxLength, MapBoundary.MaxWidth);
+            pos.z = Mathf.Clamp(pos.z, -MapBoundary.MaxLength, MapBoundary.MaxLength);
+            transform.position = pos;
+
             if (move.sqrMagnitude > 0.001f)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(move, Vector3.up);

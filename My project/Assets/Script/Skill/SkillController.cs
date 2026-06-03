@@ -19,7 +19,7 @@ public class SkillController : NetworkBehaviour
     private void Update()
     {
         // 내 캐릭터만 입력 처리
-        if (!Object.HasInputAuthority) return;
+        if (Object == null || !Object.HasInputAuthority) return;
 
         if (Input.GetKeyDown(KeyCode.Alpha1)) UseSkill(0);
         if (Input.GetKeyDown(KeyCode.Alpha2)) UseSkill(1);
