@@ -107,3 +107,7 @@ InitTestScene*.unity*
 
 # Photon App ID
 Assets/Photon/**/PhotonAppSettings.asset
+
+# Large Assets
+Assets/POLY STYLE - Vegetation Pack 2/
+Assets/POLY STYLE - Vegetation Pack 2.meta
