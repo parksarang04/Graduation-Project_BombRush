@@ -51,9 +51,13 @@ public class SimplePlayer : NetworkBehaviour
 
             // 맵 경계 클램프 추가
             Vector3 pos = transform.position;
-            pos.x = Mathf.Clamp(pos.x, -MapBoundary.MaxLength, MapBoundary.MaxWidth);
-            pos.z = Mathf.Clamp(pos.z, -MapBoundary.MaxLength, MapBoundary.MaxLength);
-            transform.position = pos;
+            pos.x = Mathf.Clamp(pos.x,
+                MapBoundary.Center.x - MapBoundary.MaxWidth,
+                MapBoundary.Center.x + MapBoundary.MaxWidth);
+
+            pos.z = Mathf.Clamp(pos.z,
+                MapBoundary.Center.z - MapBoundary.MaxLength,
+                MapBoundary.Center.z + MapBoundary.MaxLength);
 
             if (move.sqrMagnitude > 0.001f)
             {

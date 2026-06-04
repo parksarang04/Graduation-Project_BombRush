@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour
     [Header("카메라 설정")]
     [SerializeField] private Vector3 offset = new Vector3(0f, 15f, -10f);   // 카메라 위치 오프셋
     [SerializeField] private float smoothSpeed = 5f;
+    [SerializeField] private float lookDownAngle = 50f;                     // 내려다보는 각도
 
     private Transform target;       // 따라갈 플레이어
 
@@ -27,8 +28,8 @@ public class CameraController : MonoBehaviour
             smoothSpeed * Time.deltaTime
         );
 
-        // 항상 플레이어 바라보기
-        transform.LookAt(target.position);
+        // 비스듬히 아래를 바라봄
+        transform.rotation = Quaternion.Euler(lookDownAngle, 0f, 0f);
     }
 
     private void FindLocalPlayer()
