@@ -39,7 +39,7 @@ public class SimplePlayer : NetworkBehaviour
             Debug.Log("슬로우 해제");
         }
 
-        if (GetInput<FusionBootstrap.NetworkInputData>(out var inputData))
+        if (GetInput<NetworkInputData>(out var inputData))
         {
             Vector3 move = new Vector3(inputData.move.x, 0f, inputData.move.y);
 

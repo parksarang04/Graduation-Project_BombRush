@@ -7,141 +7,94 @@ using UnityEngine;
 
 public class FusionBootstrap : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [Header("Session")]
-    [SerializeField] private string sessionName = "Room_01";
+    public static FusionBootstrap Instance { get; private set; }
 
-    [Header("Player")]
-    [SerializeField] private NetworkPrefabRef playerPrefab;                     // 네트워크에 등록된 프리팹
-    [SerializeField] private Transform[] spawnPoints;                           // 스폰 위치 설정
+    [SerializeField] private string sessionName = "BombRush_Room";
 
-    private Dictionary<PlayerRef, NetworkObject> playerObjects = new();
+    public NetworkRunner Runner { get; private set; }
 
-    private NetworkRunner runner;
-
-    public struct NetworkInputData : INetworkInput
+    private void Awake()
     {
-        public Vector2 move;
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     public void StartHost() => _ = StartGame(GameMode.Host);
-    public void StartClinet() => _ = StartGame(GameMode.Client);
+    public void StartClient() => _ = StartGame(GameMode.Client);
 
-    private Vector3 GetSpawnPosition(PlayerRef player)
+    public void LoadCharSelectScene()
     {
-        if (spawnPoints != null && spawnPoints.Length > 0)  // SpawnPoints가 최소 1개 이상 들어있을 때만 실행
-        {
-            int index = player.RawEncoded % spawnPoints.Length;
-            return spawnPoints[index].position;
-        }
+        if (Runner == null) return;
+        if (!Runner.IsServer) return;
 
-        return new Vector3(player.RawEncoded * 2, 1, 0);
+        Runner.LoadScene(SceneRef.FromIndex(1));   //CharSelect
+        Debug.Log("캐릭터 선택 씬 로드");
+    }
+
+    public void LoadGameScene()
+    {
+        if (Runner == null) return;
+        if (!Runner.IsServer) return;
+
+        Runner.LoadScene(SceneRef.FromIndex(2));  // SampleScene
+        Debug.Log("게임 씬 로드");
     }
 
     private async Task StartGame(GameMode mode)
     {
-        if (runner != null) return;
+        if (Runner != null) return;
 
-        runner = gameObject.AddComponent<NetworkRunner>();
-        runner.ProvideInput = true;
+        Runner = gameObject.AddComponent<NetworkRunner>();
+        Runner.ProvideInput = true;
+        Runner.AddCallbacks(this);
 
-        runner.AddCallbacks(this);
+        NetworkSceneManagerDefault sceneManager =
+            gameObject.AddComponent<NetworkSceneManagerDefault>();
 
-        var SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
-
-        var result = await runner.StartGame(new StartGameArgs
+        StartGameResult result = await Runner.StartGame(new StartGameArgs
         {
             GameMode = mode,
             SessionName = sessionName,
-            SceneManager = SceneManager
+            SceneManager = sceneManager
         });
 
         if (result.Ok)
-            Debug.Log($"[Fusion] StartGame OK - {mode} / {sessionName}");
+            Debug.Log($"[Fusion] 연결 성공 : {mode}");
         else
-            Debug.LogError($"[Fusion] StartGame FAILED - {result.ShutdownReason}");
-    }
-
-    //-------------- 콜백 (필수/미사용은 빈 구현)--------------//
-
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) 
-    {
-        Debug.Log($"플레이어 입장 : {player}");
-
-        if (runner.IsPlayer == false)
-            return;
-
-        Vector3 spawnPos = GetSpawnPosition(player);
-
-        var obj =runner.Spawn(
-           playerPrefab,
-           spawnPos,
-           Quaternion.identity,
-           player
-        );
-
-        playerObjects[player] = obj;
-
-    }
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) 
-    {
-        if (!runner.IsServer) return;
-
-        if (playerObjects.TryGetValue(player, out var obj))
-        {
-            runner.Despawn(obj);
-            playerObjects.Remove(player);
-        }
-        Debug.Log($"플레이어 제거됨 : {player}");
+            Debug.LogError($"[Fusion] 연결 실패 : {result.ShutdownReason}");
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         NetworkInputData data = new NetworkInputData();
-
         data.move = new Vector2(
-            Input.GetAxisRaw("Horizontal"),     // GetAxis = 부드러운 이동 || GetAxisRaw = 키보드 값을 눌렀을때 즉시 반응
+            Input.GetAxisRaw("Horizontal"),
             Input.GetAxisRaw("Vertical")
         );
-
         input.Set(data);
     }
 
-    public void OnInputMissing(NetworkRunner runner, PlayerRef player , NetworkInput input) { }
-
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
-
-    public void OnDisconnectedFromServer(NetworkRunner runner , NetDisconnectReason reason) 
-    {
-        Debug.Log($"[Fusion] Disconnected : {reason}");
-    }
-    
-    public void OnShutdown(NetworkRunner runner, ShutdownReason reason)
-    {
-        Debug.Log($"[Fusion] Shutdown : {reason}");
-        this.runner = null;
-    }
-
-    public void OnConnectRequest(NetworkRunner runner , NetworkRunnerCallbackArgs.ConnectRequest request , byte[] token) { }
-
-    public void OnConnectFailed(NetworkRunner runner, NetAddress netAddress, NetConnectFailedReason reason) { }
-
-    public void OnSessionListUpdated(NetworkRunner runner , List<SessionInfo> sessionList) { }
-
-    public void OnCustomAuthenticationResponse(NetworkRunner runner , Dictionary<string, object> data) { }
-
-    public void OnHostMigration(NetworkRunner runner , HostMigrationToken hostMigrationToken) { }
-
-    public void OnUserSimulationMessage(NetworkRunner runner , SimulationMessagePtr message) { }
-
-    public void OnReliableDataReceived(NetworkRunner runner , PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
-
-    public void OnReliableDataProgress(NetworkRunner runner , PlayerRef plaer, ReliableKey key, float progress) { }
-
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason reason) { Runner = null; }
+    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
+    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
     public void OnSceneLoadStart(NetworkRunner runner) { }
-
     public void OnSceneLoadDone(NetworkRunner runner) { }
-
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
 }
