@@ -1,82 +1,107 @@
-using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Fusion;
 
 public class CharacterSelectUI : MonoBehaviour
 {
-    [Header("버튼")]
-    [SerializeField] private Button buttonTank;
-    [SerializeField] private Button buttonHealer;
-    [SerializeField] private Button buttonDealer;
-    [SerializeField] private Button buttonReady;
-    [SerializeField] private Button buttonStart;
+    [Header("Select Buttons")]
+    [SerializeField] private Button tankerButton;
+    [SerializeField] private Button healerButton;
+    [SerializeField] private Button dealerButton;
 
-    [Header("텍스트")]
-    [SerializeField] private TextMeshProUGUI textMySelect;
-    [SerializeField] private TextMeshProUGUI textStatus;
+    [Header("Card Highlight (선택 시 테두리)")]
+    [SerializeField] private Image tankerCardBorder;
+    [SerializeField] private Image healerCardBorder;
+    [SerializeField] private Image dealerCardBorder;
+
+    [Header("Class Info Text")]
+    [SerializeField] private TextMeshProUGUI classNameText;
+    [SerializeField] private TextMeshProUGUI classDescText;
+
+    [Header("Confirm Button")]
+    [SerializeField] private Button confirmButton;
+
+    [Header("Locked Overlay (중복 방지)")]
+    [SerializeField] private GameObject tankerLockedOverlay;
+    [SerializeField] private GameObject healerLockedOverlay;
+    [SerializeField] private GameObject dealerLockedOverlay;
 
     private string selectedClass = "";
-    private bool isReady = false;
+
+    // 클래스 설명
+    private readonly string[] classNames = { "탱커", "힐러", "딜러" };
+    private readonly string[] classDescs =
+    {
+        "팀의 방패!\n높은 체력과 방어력으로\n적의 공격을 막아냅니다.",
+        "팀의 생명줄!\n아군을 치료하고\n버프를 부여합니다.",
+        "팀의 창!\n강력한 스킬로\n적을 섬멸합니다."
+    };
 
     private void Start()
     {
-        // Start 버튼은 Host만 보임
-        if (FusionBootstrap.Instance != null)
-        {
-            buttonStart.gameObject.SetActive(
-                FusionBootstrap.Instance.Runner.IsServer
-            );
-        }
+        tankerButton.onClick.AddListener(() => SelectClass("Tanker", 0));
+        healerButton.onClick.AddListener(() => SelectClass("Healer", 1));
+        dealerButton.onClick.AddListener(() => SelectClass("Dealer", 2));
+        confirmButton.onClick.AddListener(OnConfirm);
 
-        buttonStart.interactable = false;
+        confirmButton.interactable = false;
 
-        buttonTank.onClick.AddListener(() => SelectClass("Tank"));
-        buttonHealer.onClick.AddListener(() => SelectClass("Healer"));
-        buttonDealer.onClick.AddListener(() => SelectClass("Dealer"));
-        buttonReady.onClick.AddListener(OnClickReady);
-        buttonStart.onClick.AddListener(OnClickStart);
+        // 초기 테두리 숨기기
+        SetAllBordersInactive();
     }
 
-    private void SelectClass(string className)
+    private void SelectClass(string className, int index)
     {
         selectedClass = className;
-        textMySelect.text = $"선택 : {className}";
-        Debug.Log($"클래스 선택 : {className}");
-    }
-
-    private void OnClickReady()
-    {
-        if (selectedClass == "")
-        {
-            textStatus.text = "캐릭터를 먼저 선택하세요!";
-            return;
-        }
-
-        isReady = true;
-        buttonReady.interactable = false;
-        textStatus.text = "준비 완료!";
-
-        // 선택 정보 저장
         PlayerPrefs.SetString("SelectedClass", selectedClass);
 
-        // Host라면 Start 버튼 활성화
-        if (FusionBootstrap.Instance.Runner.IsServer)
-        {
-            buttonStart.interactable = true;
-        }
+        // 텍스트 업데이트
+        classNameText.text = classNames[index];
+        classDescText.text = classDescs[index];
 
-        Debug.Log($"준비 완료 - 선택 클래스 : {selectedClass}");
+        // 테두리 하이라이트
+        SetAllBordersInactive();
+        Image selectedBorder = index == 0 ? tankerCardBorder :
+                               index == 1 ? healerCardBorder : dealerCardBorder;
+        selectedBorder.color = new Color(1f, 0.8f, 0f, 1f); // 골드 테두리
+
+        confirmButton.interactable = true;
     }
 
-    private void OnClickStart()
+    private void SetAllBordersInactive()
     {
-        if (!isReady)
-        {
-            textStatus.text = "먼저 준비 완료를 눌러주세요!";
-            return;
-        }
+        Color off = new Color(1f, 1f, 1f, 0f);
+        if (tankerCardBorder) tankerCardBorder.color = off;
+        if (healerCardBorder) healerCardBorder.color = off;
+        if (dealerCardBorder) dealerCardBorder.color = off;
+    }
 
-        FusionBootstrap.Instance.LoadGameScene();
+    // 다른 플레이어가 이미 선택한 클래스 잠금
+    public void LockClass(string className)
+    {
+        if (className == "Tanker" && tankerLockedOverlay) tankerLockedOverlay.SetActive(true);
+        if (className == "Healer" && healerLockedOverlay) healerLockedOverlay.SetActive(true);
+        if (className == "Dealer" && dealerLockedOverlay) dealerLockedOverlay.SetActive(true);
+    }
+
+    private void OnConfirm()
+    {
+        if (string.IsNullOrEmpty(selectedClass)) return;
+
+        PlayerPrefs.SetString("SelectedClass", selectedClass);
+        PlayerPrefs.Save();
+
+        // NetworkRunner로 씬 전환
+        var runner = FindObjectOfType<NetworkRunner>();
+        if (runner != null)
+        {
+            runner.LoadScene(SceneRef.FromIndex(2));
+        }
+        else
+        {
+            // NetworkRunner 없으면 일반 씬 전환
+            UnityEngine.SceneManagement.SceneManager.LoadScene(2);
+        }
     }
 }
