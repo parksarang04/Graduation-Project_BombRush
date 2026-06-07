@@ -15173,10 +15173,15 @@ MonoBehaviour:
   - {fileID: 1151155332}
   - {fileID: 354974396}
   - {fileID: 756421456}
-  characterPrefabs:
-  - RawGuidValue: a3e4b341ac3698848878e3331300c432
-  - RawGuidValue: a3e4b341ac3698848878e3331300c432
-  - RawGuidValue: a3e4b341ac3698848878e3331300c432
+  tankerPrefabs:
+  - RawGuidValue: 02012670e5630814f973ea34bbf197ba
+  - RawGuidValue: 4e15b22361432074d8e56c30b40fbf47
+  healerPrefabs:
+  - RawGuidValue: f9d15b62d4b8c3547b159aa6a0e49d8e
+  - RawGuidValue: 3a1bb387332b57448a46bb18e9bd5f14
+  dealerPrefabs:
+  - RawGuidValue: 6c1d488e9e4a9fd4bb07c9ed397d0630
+  - RawGuidValue: 23296d83badf7634e8d1160fbbef8eff
   introCamera: {fileID: 330585549}
 --- !u!114 &1407067081
 MonoBehaviour:

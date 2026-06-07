@@ -29,7 +29,6 @@ public class CharacterSelectUI : MonoBehaviour
 
     private string selectedClass = "";
 
-    // 클래스 설명
     private readonly string[] classNames = { "탱커", "힐러", "딜러" };
     private readonly string[] classDescs =
     {
@@ -38,35 +37,64 @@ public class CharacterSelectUI : MonoBehaviour
         "팀의 창!\n강력한 스킬로\n적을 섬멸합니다."
     };
 
+    private void Awake()
+    {
+        Debug.Log("[CharacterSelectUI] Awake 호출됨!");
+
+        // null 체크
+        if (tankerButton == null) Debug.LogError("tankerButton 연결 안됨!");
+        if (healerButton == null) Debug.LogError("healerButton 연결 안됨!");
+        if (dealerButton == null) Debug.LogError("dealerButton 연결 안됨!");
+        if (confirmButton == null) Debug.LogError("confirmButton 연결 안됨!");
+    }
+
     private void Start()
     {
-        tankerButton.onClick.AddListener(() => SelectClass("Tanker", 0));
-        healerButton.onClick.AddListener(() => SelectClass("Healer", 1));
-        dealerButton.onClick.AddListener(() => SelectClass("Dealer", 2));
+        Debug.Log("[CharacterSelectUI] Start 호출됨!");
+
+        tankerButton.onClick.AddListener(OnTankerSelected);
+        healerButton.onClick.AddListener(OnHealerSelected);
+        dealerButton.onClick.AddListener(OnDealerSelected);
         confirmButton.onClick.AddListener(OnConfirm);
 
         confirmButton.interactable = false;
-
-        // 초기 테두리 숨기기
         SetAllBordersInactive();
     }
 
     private void SelectClass(string className, int index)
     {
+        Debug.Log($"[CharacterSelectUI] SelectClass 호출됨: {className}");
         selectedClass = className;
         PlayerPrefs.SetString("SelectedClass", selectedClass);
 
-        // 텍스트 업데이트
-        classNameText.text = classNames[index];
-        classDescText.text = classDescs[index];
+        if (classNameText != null) classNameText.text = classNames[index];
+        if (classDescText != null) classDescText.text = classDescs[index];
 
-        // 테두리 하이라이트
         SetAllBordersInactive();
         Image selectedBorder = index == 0 ? tankerCardBorder :
                                index == 1 ? healerCardBorder : dealerCardBorder;
-        selectedBorder.color = new Color(1f, 0.8f, 0f, 1f); // 골드 테두리
+        if (selectedBorder != null)
+            selectedBorder.color = new Color(1f, 0.8f, 0f, 1f);
 
         confirmButton.interactable = true;
+    }
+
+    public void OnTankerSelected()
+    {
+        Debug.Log("[CharacterSelectUI] 탱커 버튼 클릭됨!");
+        SelectClass("Tanker", 0);
+    }
+
+    public void OnHealerSelected()
+    {
+        Debug.Log("[CharacterSelectUI] 힐러 버튼 클릭됨!");
+        SelectClass("Healer", 1);
+    }
+
+    public void OnDealerSelected()
+    {
+        Debug.Log("[CharacterSelectUI] 딜러 버튼 클릭됨!");
+        SelectClass("Dealer", 2);
     }
 
     private void SetAllBordersInactive()
@@ -77,7 +105,6 @@ public class CharacterSelectUI : MonoBehaviour
         if (dealerCardBorder) dealerCardBorder.color = off;
     }
 
-    // 다른 플레이어가 이미 선택한 클래스 잠금
     public void LockClass(string className)
     {
         if (className == "Tanker" && tankerLockedOverlay) tankerLockedOverlay.SetActive(true);
@@ -85,22 +112,27 @@ public class CharacterSelectUI : MonoBehaviour
         if (className == "Dealer" && dealerLockedOverlay) dealerLockedOverlay.SetActive(true);
     }
 
-    private void OnConfirm()
+    public void OnConfirm()
     {
-        if (string.IsNullOrEmpty(selectedClass)) return;
+        Debug.Log("[CharacterSelectUI] 확인 버튼 클릭됨!");
+        if (string.IsNullOrEmpty(selectedClass))
+        {
+            Debug.LogWarning("선택된 클래스 없음!");
+            return;
+        }
 
         PlayerPrefs.SetString("SelectedClass", selectedClass);
         PlayerPrefs.Save();
 
-        // NetworkRunner로 씬 전환
-        var runner = FindObjectOfType<NetworkRunner>();
+        var runner = FindFirstObjectByType<NetworkRunner>();
         if (runner != null)
         {
+            Debug.Log("NetworkRunner로 씬 전환!");
             runner.LoadScene(SceneRef.FromIndex(2));
         }
         else
         {
-            // NetworkRunner 없으면 일반 씬 전환
+            Debug.Log("일반 씬 전환!");
             UnityEngine.SceneManagement.SceneManager.LoadScene(2);
         }
     }

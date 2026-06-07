@@ -2339,6 +2339,15 @@ GameObject:
   m_Component:
   - component: {fileID: 4312128889311213015}
   - component: {fileID: 4542562126982156247}
+  - component: {fileID: 7650302015815235656}
+  - component: {fileID: 8939133355913628297}
+  - component: {fileID: 2011750949972554746}
+  - component: {fileID: 4838981280909725387}
+  - component: {fileID: 5037948353383780459}
+  - component: {fileID: -3747304380784134180}
+  - component: {fileID: -6628221631049001500}
+  - component: {fileID: -9146915769814173495}
+  - component: {fileID: -4507417032282779675}
   m_Layer: 0
   m_Name: 1.Dealer_Human
   m_TagString: PreviewOnly
@@ -2385,6 +2394,162 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7650302015815235656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 1307120406
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 8939133355913628297}
+  - {fileID: 2011750949972554746}
+  - {fileID: 4838981280909725387}
+  - {fileID: 5037948353383780459}
+  - {fileID: -3747304380784134180}
+  - {fileID: -6628221631049001500}
+  - {fileID: -9146915769814173495}
+  - {fileID: -4507417032282779675}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &8939133355913628297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0bc9c2fca07f0747af6e3b8515ce53d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimplePlayer
+  moveSpeed: 5
+  rotateSpeed: 10
+--- !u!114 &2011750949972554746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8091317cc148cd841ba43ee21760ac7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WSkill_Dash
+  skillName: "\uC2A4\uD0AC"
+  cooldown: 2
+  dashDistance: 5
+  dashDuration: 0.2
+--- !u!114 &4838981280909725387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a66fecb63f793a4aaeab646b25acb23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkillController
+--- !u!114 &5037948353383780459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1233e0492f35baf4d955633e4225773b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RSkill_Ult
+  skillName: "\uC2A4\uD0AC"
+  cooldown: 2
+  radius: 6
+  damage: 60
+  slowMiltiplier: 0.2
+  slowDuration: 3
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &-3747304380784134180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1927f01dd978504d838b33244ccb8d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QSkill_Aoe
+  skillName: "\uC2A4\uD0AC"
+  cooldown: 2
+  radius: 3
+  damage: 30
+  targetmask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &-6628221631049001500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca8e2a6c69867994ca11ffed7f65b8d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ESkill_Slow
+  skillName: "\uC2A4\uD0AC"
+  cooldown: 2
+  radius: 4
+  slowMultiplier: 0.3
+  slowDuration: 2
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &-9146915769814173495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 397680ea5b905af4097a11f4f0028815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthTarget
+  maxHp: 100
+  _Hp: 0
+--- !u!114 &-4507417032282779675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5910868288459020158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0bc9c2fca07f0747af6e3b8515ce53d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimplePlayer
+  moveSpeed: 5
+  rotateSpeed: 10
 --- !u!1 &5981386733105564309
 GameObject:
   m_ObjectHideFlags: 0

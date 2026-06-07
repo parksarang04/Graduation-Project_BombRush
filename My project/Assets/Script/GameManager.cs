@@ -9,10 +9,10 @@ public class GameManager : NetworkBehaviour
     [Header("¸Ê")]
     [SerializeField] private GameObject[] maps;
 
-    [Header("Ä³¸¯ÅÍ ÇÁ¸®ÆÕ (0:ÅÊÄ¿, 1:Èú·¯, 2:µô·¯)")]
-    [SerializeField] private NetworkPrefabRef tankerPrefab;
-    [SerializeField] private NetworkPrefabRef healerPrefab;
-    [SerializeField] private NetworkPrefabRef dealerPrefab;
+    [Header("Ä³¸¯ÅÍ ÇÁ¸®ÆÕ")]
+    [SerializeField] private NetworkPrefabRef[] tankerPrefabs; // 1.Tank, 2.Tank
+    [SerializeField] private NetworkPrefabRef[] healerPrefabs; // 1.Healer, 2.Healer
+    [SerializeField] private NetworkPrefabRef[] dealerPrefabs; // 1.Dealer, 2.Dealer
 
     [Header("ÀÎÆ®·Î")]
     [SerializeField] private IntroCameraController introCamera;
@@ -126,10 +126,10 @@ public class GameManager : NetworkBehaviour
     {
         return className switch
         {
-            "Tanker" => tankerPrefab,
-            "Healer" => healerPrefab,
-            "Dealer" => dealerPrefab,
-            _ => tankerPrefab
+            "Tanker" => tankerPrefabs[Random.Range(0, tankerPrefabs.Length)],
+            "Healer" => healerPrefabs[Random.Range(0, healerPrefabs.Length)],
+            "Dealer" => dealerPrefabs[Random.Range(0, dealerPrefabs.Length)],
+            _ => tankerPrefabs[0]
         };
     }
 
